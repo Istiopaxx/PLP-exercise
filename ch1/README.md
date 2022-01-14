@@ -295,12 +295,29 @@ something that needs to be recompiled?
 
 ## 1.9
 
+
+#### Q
+
 Why is it difficult to tell whether a program is correct? How do you go about
 finding bugs in your code? What kinds of bugs are revealed by testing? What
 kinds of bugs are not? (For more formal notions of program correctness,
 see the bibliographic notes at the end of Chapter 4.)
 
+#### A
+
+1. Why is it difficult to tell whether a program is correct?
+    + Because.. the program's correctness of functionality can be tested by only real uses.
+    + Get in the input and see what is output.
+    + Or.. it may be a memory leaks or unsafe vulnerable point of program. it is difficult to find in testing.
+2. What kind of bugs are discovered by testing?
+    + Functionality bugs. -> testing often applied for program's functionality, rather than safety.
+3. What kind of bugs are hard to be discovered by testing?
+    + Memory leaks, unsafe external dependencies, other potential security problems... etc.
 
 
 
+
+---
+
+# Explorations
 
