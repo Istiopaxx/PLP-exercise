@@ -257,6 +257,531 @@ Then it finds `g` in `main: stack 0`'s scope, then it finds `g`.
 
 As part of the development team at MumbleTech.com, Janet has written a list manipulation library for C that contains, among other things, the code in Figure 3.16.
 
+```C
+typedef struct list_node
+{
+    void *data;
+    struct list_node *next;
+} list_node;
+
+list_node *insert(void *d, list_node *L)
+{
+    list_node *t = (list_node *)malloc(sizeof(list_node));
+    t->data = d;
+    t->next = L;
+    return t;
+}
+
+list_node *reverse(list_node *L)
+{
+    list_node *rtn = 0;
+    while (L)
+    {
+        rtn = insert(L->data, rtn);
+        L = L->next;
+    }
+    return rtn;
+}
+
+void delete_list(list_node *L)
+{
+    while (L)
+    {
+        list_node *t = L;
+        L = L->next;
+        free(t->data);
+        free(t);
+    }
+}
+```
+
+##### (a)
+
+Accustomed to Java, new team member Brad includes the following code in the main loop of his program:
+
+```C
+list_node* L = 0;
+while (more_widgets()) {
+    L = insert(next_widget(), L);
+}
+L = reverse(L);
+```
+Sadly, after running for a while, Brad’s program always runs out of memory and crashes. 
+Explain what’s going wrong.
+
+
+##### (b)
+
+After Janet patiently explains the problem to him, Brad gives it another try:
+```C
+list_node* L = 0;
+while (more_widgets()) {
+  L = insert(next_widget(), L);
+}
+list_node* T = reverse(L);
+delete_list(L);
+L = T;
+```
+This seems to solve the insufficient memory problem, but where the program used to produce correct results (before running out of memory), now its output is strangely corrupted, and Brad goes back to Janet for advice. 
+What will she tell him this time?
+
+
+
+### A
+
+##### (a)
+
+The data in heap which name `L` points is not released after `reverse()` call.
+So loop of above codes would make heap memory full with not using data.
+
+##### (b)
+
+In `reverse()`, the reversed list nodes' data is actually points to the nodes' data before reversed.
+`delete_list()` call release the original list nodes' data, so reversed list node's data field, which is pointer to original nodes' data, is released.
+That's because the data is strangely corrupted.
+
+
+---
+
+
+## 3-8
+ 
+### Q
+
+Rewrite Figures 3.6 and 3.7 in C. 
+You will need to use separate compilation for name hiding.
+
+```cpp
+// Figure 3.6
+#include <time.h>
+
+namespace rand_mod {
+    unsigned int seed = time(0); // initialize from current time of day
+    const unsigned int a = 48271;
+    const unsigned int m = 0x7fffffff;
+
+    void set_seed(unsigned int s) {
+        seed = s;
+    }
+
+    unsigned int rand_int() {
+        return seed = (a * seed) % m;
+    }
+}
+```
+
+```cpp
+// Figure 3.7
+#include <time.h>
+
+namespace rand_mgr {
+    const unsigned int a = 48271;
+    const unsigned int m = 0x7fffffff;
+
+    typedef struct {
+        unsigned int seed;
+    } generator;
+
+    generator* create() {
+        generator* g = new generator;
+        g->seed = time(0);
+        return g;
+    }
+
+    void set_seed(generator* g, unsigned int s) {
+        g->seed = s;
+    }
+
+    unsigned int rand_int(generator* g) {
+        return g->seed = (a * g->seed) % m;
+    }
+}
+```
+
+
+
+### A
+
+`3-8.rand_mod.c` and `3-8.rand_mgr.c` file.
+
+
+
+---
+
+
+## 3-9
+ 
+### Q
+
+Consider the following fragment of code in C:
+```
+{ int a, b, c;
+    ...
+
+    { int d, e;
+        ...
+
+        { int f;
+            ...
+
+        }
+        ...
+    }
+    ...
+
+    { int g, h, i;
+        ...
+
+    }
+    ...
+}
+```
+
+##### (a)
+
+Assume that each integer variable occupies four bytes.
+How much total space is required for the variables in this code?
+
+
+##### (b)
+
+Describe an algorithm that a compiler could use to assign stack frame offsets to the variables of arbitrary nested blocks, in a way that minimizes the total space required.
+
+
+
+### A
+
+
+##### (a)
+
+Maximum number of variables which can exist at the same time is 6, so 6 * 4 = 24 bytes.
+
+##### (b)
+
+Below is pseudocode.
+var_offset_map saves the variable's stack frame offset.
+
+```
+variable_stack;
+var_offset_map;
+block_open {
+  open_offset;
+  prev;
+}
+
+/* save recent opened block's start offset and
+ * prev opened block's block_open instance. */
+recent_open = block_open(offset_start, null);
+current_offset = offset_start;
+
+while (is_next_token()) {
+  next_token = get_next_token();
+
+  /* if meet block-opening, update recent_open */
+  if (is_block_opening(next_token))
+    recent_open = block_open(current_offset, recent_open);
+
+  /* if meet block-closing, pop all variables in that block(lexical scope) */
+  else if (is_block_closing(next_token)) {
+    while(current_offset > recent_open.open_offset) {
+      current_offset -= sizeof(typeof(variable_stack.top()));
+      variable_stack.pop();
+    }
+    recent_open = recent_open.prev;
+  }
+
+  /* if meet variable, update current_offset and push to stack */
+  else if (is_variable(next_token)) {
+    // save variable's offset
+    var_offset_map.insert({next_token, current_offset});
+
+    // update stack and current_offset
+    variable_stack.push(next_token);
+    current_offset += sizeof(typeof(next_token));
+  }
+}
+
+```
+
+
+
+---
+
+
+## 3-10
+ 
+### Q
+
+Consider the design of a Fortran 77 compiler that uses static allocation for the local variables of subroutines. 
+Expanding on the solution to the previous question, describe an algorithm to minimize the total space required for these variables.
+You may find it helpful to construct a `call graph` data structure in which each node represents a subroutine, and each directed arc indicates that the subroutine at the tail may sometimes call the subroutine at the head.
+
+
+### A
+
+1. First scan all code and get all location of subroutine definition.
+
+2. Make N call graph nodes which N is number of all subroutine definitions.
+
+3. Looking around all subroutine's definition, if the subroutine calls other subroutine, make directed arc from caller to callee in call graph.
+
+4. Start traverse from call graph's start call(maybe main procedure), do bfs(or dfs) the graph.
+
+5. If a call graph node visited, static allocation of local variables in coresponding subroutine's definition, and saves the offset.
+
+
+---
+
+
+## 3-11
+ 
+### Q
+
+Consider the following pseudocode:
+```
+1. procedure P(A, B : real)
+2.     X : real
+ 
+3.     procedure Q(B, C : real)
+4.         Y : real
+5.         ...
+ 
+6.     procedure R(A, C : real)
+7.         Z : real
+8.         ...           –– (*)
+ 
+9.     ...
+```
+
+Assuming static scope, what is the referencing environment at the location marked by (*)?
+
+
+### A
+```
+B : real // in 1st line
+X : real // in 2nd line
+A : real // ┬ in 6th line
+C : real // ┘
+Z : real // in 7th line
+```
+
+---
+
+
+## 3-12
+ 
+### Q
+
+Write a simple program in Scheme that displays three different behaviors, depending on whether we use `let`, `let*`, or `letrec` to declare a given set of names.
+(Hint: To make good use of `letrec`, you will probably want your names to be functions [lambda expressions].)
+
+
+### A
+
+```Scheme
+(let ((x 2) (y 3))
+  (let ((x 7) (z (+ x y)))
+    (* z x)))
+; 35
+
+(let* ((x 2) (y 3))
+  (let* ((x 7) (z (+ x y)))
+    (* z x)))
+; 70
+
+(letrec ((x 2)
+         (y 3))
+  (letrec ((x 7) (z (+ x y)))
+    (* z x)))
+; error
+;   x: undefined;
+;   cannot use before initialization
+```
+
+> [Reference](https://www.cs.cmu.edu/Groups/AI/html/r4rs/r4rs_6.html#SEC35)
+
+
+
+---
+
+
+## 3-13
+ 
+### Q
+
+Consider the following program in Scheme:
+
+```Scheme
+(define A
+  (lambda()
+    (let* ((x 2)
+           (C (lambda (P)
+                (let ((x 4))
+                  (P))))
+           (D (lambda ()
+                x))
+           (B (lambda ()
+                (let ((x 3))
+                  (C D)))))
+      (B))))
+```
+
+What does this program print?
+What would it print if Scheme used dynamic scoping and shallow binding?
+Dynamic scoping and deep binding? 
+Explain your answers.
+
+
+### A
+
+1. Scheme is lexical(static) scope and deep binding: code prints `2`.
+
+2. Dynamic scoping and shallow binding : code prints `3`.
+
+3. Dynamic scoping and deep binding : code prints `2`.
+
+---
+
+
+## 3-14
+ 
+### Q
+
+Consider the following pseudocode:
+
+```
+1.  x : integer –– global
+
+2.  procedure set_x(n : integer)
+3.      x := n
+
+4.  procedure print_x()
+5.      write_integer(x)
+
+6.  procedure first()
+7.      set_x(1)
+8.      print_x()
+
+9.  procedure second()
+10.     x : integer
+11.     set_x(2)
+12.     print_x()
+
+13. set_x(0)
+14. first()
+15. print_x()
+16. second()
+17. print_x()
+```
+What does this program print if the language uses static scoping? 
+What does it print with dynamic scoping?
+Why?
+
+
+### A
+
+1. Static scoping
+```
+1   // 8th line
+1   // 15th line
+2   // 12th line
+2   // 17th line
+```
+
+
+2. Dynamic scoping
+```
+1   // 8th line
+1   // 15th line
+2   // 12th line
+1   // 17th line
+```
+At 16th line, after end of `second()` call, the local `x` is deleted.
+So 17th line `print_x()` call use most recent used, and alive in current execution `x`.
+
+---
+
+
+## 3-15
+ 
+### Q
+
+The principal argument in favor of dynamic scoping is that it facilitates the customization of subroutines. 
+Suppose, for example, that we have a library routine `print_integer` that is capable of printing its argument in any of several bases (decimal, binary, hexadecimal, etc.). 
+Suppose further that we want the routine to use decimal notation most of the time, and to use other bases only in a few special cases: we do not want to have to specify a base explicitly on each individual call. 
+We can achieve this result with dynamic scoping by having `print_integer` obtain its base from a nonlocal variable `print_base`. 
+We can establish the default behavior by declaring a variable `print_base` and setting its value to 10 in a scope encountered early in execution. 
+Then, any time we want to change the base temporarily, we can write
+
+```
+begin –– nested block
+    print base : integer := 16    –– use hexadecimal
+    print integer(n)
+```
+
+The problem with this argument is that there are usually other ways to achieve the same effect, without dynamic scoping.
+Describe at least two for the `print_integer` example.
+
+
+
+### A
+
+1. make two different base function, and use multiple definition.
+```
+print_integer(n);
+print_integer_base(n, 16);
+print_integer(n, 16);
+```
+This way can be implemented easily by overriding, polymorphism, etc.
+
+2. use nonlocal variable `print_base`, but after `print_integer()` call, restore `print_base`;
+```
+begin     -- nested block
+    print_base_save : integer := print_base
+    print_base := 16      -- use hexadecimal
+    print_integer(n)
+    print_base := print_base_save
+```
+This way is dangerous: programmer may forget to restore the value.
+
+
+
+
+---
+
+
+## 3-16
+ 
+### Q
+
+As noted in Section 3.6.3, C# has unusually sophisticated support for first-class subroutines.
+Among other things, it allows delegates to be instantiated from anonymous nested methods, and gives local variables and parameters unlimited extent when they may be needed by such a delegate. 
+Consider the implications of these features in the following C# program:
+
+
+```c-sharp
+using System;
+
+public delegate int UnaryOp(int n);
+    // type declaration: UnaryOp is a function from ints to ints
+
+public class Foo {
+    static int a = 2;
+    static UnaryOp b(int c) {
+        int d = a + c;
+        Console.WriteLine(d);
+        return delegate(int n) { return c + n; };
+    }
+    public static void Main(string[] args) {
+        Console.WriteLine(b(3)(4));
+    }
+}
+```
+What does this program print? Which of a, b, c, and d, if any, is likely to be statically allocated? 
+Which could be allocated on the stack? 
+Which would need to be allocated in the heap?
+Explain.
+
 
 ### A
 
@@ -266,11 +791,18 @@ As part of the development team at MumbleTech.com, Janet has written a list mani
 ---
 
 
-## 3-
+## 3-17
  
 ### Q
 
-
+If you are familiar with structured exception handling, as provided in Ada, C++, Java, C#, ML, Python, or Ruby, consider how this mechanism relates to the issue of scoping. 
+Conventionally, a `raise` or `throw` statement is thought of as referring to an exception, which it passes as a parameter to a handler-finding library routine. 
+In each of the languages mentioned, the exception itself must be declared in some surrounding scope, and is subject to the usual static scope rules. 
+Describe an alternative point of view, in which the `raise` or `throw` is actually a reference to a handler, to which it transfers control directly. 
+Assuming this point of view, what are the scope rules for handlers? 
+Are these rules consistent with the rest of the language?
+Explain. 
+(For further information on exceptions, see Section 9.4.)
 
 
 ### A
@@ -281,14 +813,108 @@ As part of the development team at MumbleTech.com, Janet has written a list mani
 ---
 
 
-## 3-
+## 3-18
  
 ### Q
 
+Consider the following pseudocode:
+```
+1.  x : integer –– global
+
+2.  procedure set_x(n : integer)
+3.      x := n
+
+4.  procedure print_x()
+5.      wirte_integer(x)
+
+6.  procedure foo(S, P : function; n : integer)
+7.      x : integer := 5
+8.      if n in {1, 3}
+9.          set_x(n)
+10.     else
+11.         S(n)
+12.     if n in {1, 2}
+13.         print_x()
+14.     else
+15.         P
+
+16. set_x(0); foo(set_x, print_x, 1); print_x()
+17. set_x(0); foo(set_x, print_x, 2); print_x()
+18. set_x(0); foo(set_x, print_x, 3); print_x()
+19. set_x(0); foo(set_x, print_x, 4); print_x()
+```
+Assume that the language uses dynamic scoping.
+What does the program print if the language uses shallow binding?
+What does it print with deep binding? 
+Why?
+
+### A
+
+1. shallow binding
+```
+1 0   //
+2 0   //
+3 0   //
+4 0   //
+```
+
+2. deep binding
+```
+1 0   //
+5 2   //
+0 0   //
+4 4   //
+```
+
+
+---
+
+
+## 3-19
+ 
+### Q
+
+Consider the following pseudocode:
+```
+1.  x : integer := 1
+2.  y : integer := 2
+
+3.  procedure add()
+4.      x := x + y
+
+5.  procedure second(P : procedure)
+6.      x : integer := 2
+7.      P()
+
+8.  procedure first
+9.      y : integer := 3
+10.     second(add)
+
+11. first()
+12. write_integer(x)
+```
+
+##### (a)
+
+What does this program print if the language uses static scoping?
+
+##### (b)
+
+What does it print if the language uses dynamic scoping with deep binding?
+
+##### (c)
+
+What does it print if the language uses dynamic scoping with shallow binding?
 
 
 
 ### A
+
+##### (a) : `3`
+
+##### (b) : `4`
+
+##### (c) : `1`
 
 
 
@@ -296,177 +922,49 @@ As part of the development team at MumbleTech.com, Janet has written a list mani
 ---
 
 
-## 3-
+## 3-20
  
 ### Q
 
-
+Consider mathematical operations in a language like C++, which supports both overloading and coercion.
+In many cases, it may make sense to provide multiple, overloaded versions of a function, one for each numeric type or combination of types. 
+In other cases, we might use a single version — probably defined for double-precision floating point arguments—and rely on coercion to allow that function to be used for other numeric types (e.g., integers). 
+Give an example in which overloading is clearly the preferable approach. 
+Give another in which coercion is almost certainly better.
 
 
 ### A
 
+1. overloading
+```cpp
+int min(int x, int y) { ... };            // (1)
+float min(float x, float y) { ... };      // (2)
+min(2147483647, 2147483646)               // call (1)
+min(0.000001, 0.0000002)                  // call (2)
+```
+First, if 64-bit integer(long long) is type-conversed to double-floating point(64-bit, but it has less significant digit numbers than 64), it has data loss, so overloading is clearly better.
+Second, coercion must converse the type of mis-matching type, so it has more overhead.
+
+2. coercion
+```cpp
+double min(double x, double y) { ... };
+min(4.0, 5.0)   // call min(4.0, 5.0)
+min(4, 5)       // coercion: 4 -> 4.0, 5 -> 5.0 => call min(4.0, 5.0)
+```
+If the operation has only no-data-loss type arguments combination, coercion gives flexibility without extra codes: so better.
 
 
 
 ---
 
-
-## 3-
+## 3-21
  
 ### Q
 
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
+In a language that supports operator overloading, build support for rational numbers. 
+Each number should be represented internally as a (numerator, denominator) pair in simplest form, with a positive denominator. 
+Your code should support unary negation and the four standard arithmetic operators. 
+For extra credit, create a conversion routine that accepts two floating-point parameters - a value and a error bound — and returns the simplest (smallest denominator) rational number within the given error bound of the given value.
 
 ### A
 
