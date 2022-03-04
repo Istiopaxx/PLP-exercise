@@ -3,12 +3,12 @@ use std::time::{Instant};
 
 #[derive(Debug)]
 struct Rational {
-    numer: i32,
-    denom: i32,
+    numer: i64,
+    denom: i64,
 }
 
 impl Rational {
-    fn gcd(a: i32, b: i32) -> i32 {
+    fn gcd(a: i64, b: i64) -> i64 {
         if b == 0 {
             a
         } else {
@@ -17,7 +17,7 @@ impl Rational {
         }
     }
 
-    fn new(numer: i32, denom: i32) -> Rational {
+    fn new(numer: i64, denom: i64) -> Rational {
         let g = Rational::gcd(numer, denom);
         Rational {
             numer: numer / g,
@@ -50,7 +50,7 @@ impl Rational {
         }
     }
 
-    fn from2(value: f64, error_bound: f64) -> Rational {
+    fn fast_from(value: f64, error_bound: f64) -> Rational {
 
         let mut lower_bound = Rational::new(0, 1);
         let mut upper_bound = Rational::new(1, 0);
@@ -74,7 +74,7 @@ impl Rational {
     }
 
     
-    fn parametric_search(direction: bool, start: &Rational, end: &Rational, value: f64, error_bound: f64) -> i32 {
+    fn parametric_search(direction: bool, start: &Rational, end: &Rational, value: f64, error_bound: f64) -> i64 {
         let start_numer = start.numer;
         let start_denom = start.denom;
         let end_numer = end.numer;
@@ -85,10 +85,10 @@ impl Rational {
         } else { 
             (end_denom, start_denom) 
         };
-        let mut lower_bound: i32 = 1;
-        let mut upper_bound: i32 = (i32::MAX - start_bound) / end_bound;
+        let mut lower_bound: i64 = 1;
+        let mut upper_bound: i64 = (i64::MAX - start_bound) / end_bound;
         loop {
-            let mid: i32 = (lower_bound + upper_bound) / 2;
+            let mid: i64 = (lower_bound + upper_bound) / 2;
             let mid_value: f64 = Rational::new(start_numer + mid * end_numer, start_denom + mid * end_denom).value();
             
             if mid == upper_bound {
@@ -164,20 +164,23 @@ fn main() {
     println!("{:?}\n", -Rational::new(2, 3));
 
 
-    measure_time(Rational::from(6.4285714285, 0.000000001));
-    measure_time(Rational::from2(6.4285714285, 0.000000001));
+    measure_time(6.4285714285, 0.000000001);
+    measure_time(6.4285714285, 0.000000001);
 
-    measure_time(Rational::from(32_581_890.5384615384, 0.0000001));
-    measure_time(Rational::from2(32_581_890.5384615384, 0.0000001));
+    measure_time(12_581_890_123.5384615384, 0.0000001);
+    measure_time(12_581_890_123.5384615384, 0.0000001);
 
-    measure_time(Rational::from(0.00000680067, 0.000001));
-    measure_time(Rational::from2(0.00000680067, 0.000001));
+    measure_time(0.00000000000006 as f64, 0.000000000000001 as f64);
+    measure_time(0.00000000000006 as f64, 0.000000000000001 as f64);
+
+    measure_time(0.75 as f64, 0.0001 as f64);
+    measure_time(0.75 as f64, 0.0001 as f64);
 }
 
 
-fn measure_time(r: Rational) {
+fn measure_time(v: f64, err: f64) {
     let start = Instant::now();
-    println!("{:?}", r);
+    println!("{:?}", Rational::fast_from(v, err));
     let end = Instant::now();
     println!("{:?}", end.duration_since(start));
 }

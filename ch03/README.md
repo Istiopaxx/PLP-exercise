@@ -2,8 +2,42 @@
 
 ---
 
+## TOC
 
-## 3-1
+1. [3-1](#3-1)
+2. [3-2](#3-2)
+3. [3-3](#3-3)
+4. [3-4](#3-4)
+5. [3-5](#3-5)
+6. [3-6](#3-6)
+7. [3-7](#3-7)
+8. [3-8](#3-8)
+9. [3-9](#3-9)
+10. [3-10](#3-10)
+11. [3-11](#3-11)
+12. [3-12](#3-12)
+13. [3-13](#3-13)
+14. [3-14](#3-14)
+15. [3-15](#3-15)
+16. [3-16](#3-16)
+17. [3-17](#3-17)
+18. [3-18](#3-18)
+19. [3-19](#3-19)
+20. [3-20](#3-20)
+21. [3-21](#3-21)
+22. [3-22](#3-22)
+23. [3-23](#3-23)
+24. [3-24](#3-24)
+25. [3-25](#3-25)
+26. [3-26](#3-26)
+27. [3-27](#3-27)
+28. [3-28](#3-28)
+29. [3-29](#3-29)
+30. [3-30](#3-30)
+31. [3-31](#3-31)
+
+
+## [3-1](#TOC)
  
 ### Q
 
@@ -53,7 +87,7 @@ Load time.
 ---
 
 
-## 3-2
+## [3-2](#TOC)
  
 ### Q
 
@@ -226,7 +260,7 @@ Stack Frame's dynamic link is the reference to caller's frame and static link is
 address, a reference to the stack frame of the caller (also called the dynamic link), ... -- book 120P
 
 2. Static link of stack frame.
-> The simplest way in which to find the frames of surrounding scopes is to maintain a static link in each frame that points to the “parent” frame: the frame of the most recent invocation of the lexically surrounding subroutine. -- book 129~130P
+> The simplest way in which to find the frames of surrounding scopes is to maintain a static link in each frame that points to the "parent" frame: the frame of the most recent invocation of the lexically surrounding subroutine. -- book 129~130P
 
 |stack|dynamic-link|static-link|
 |-------------|:-----------:|:-----------:|
@@ -968,13 +1002,53 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 
 ### A
 
-
+<img src="./images/3-21.PNG">
 
 
 ---
 
 
-## 3-
+## 3-22
+ 
+### Q
+
+In an imperative language with lambda expressions (e.g., C#, Ruby, C++, or Java), write the following higher-level functions. 
+(A higher-level function, as we shall see in Chapter 11, takes other functions as argument and/or returns a function as a result.)
+
++ `compose(g, f)` — returns a function `h` such that `h(x) == g(f(x))`.
++ `map(f, L)` — given a function `f` and a list `L` returns a list `M` such that the i-th element of `M` is `f(e)`, where `e` is the i-th element of `L`.
++ `filter(L, P)` — given a list `L` and a predicate (Boolean-returning function) `P`, returns a list containing all and only those elements of `L` for which `P` is true.
+
+
+### A
+
+<img src="./images/3-22.PNG">
+
+
+---
+
+
+## 3-23
+
+### Q
+
+Can you write a macro in standard C that "returns" the greatest common divisor of a pair of arguments, without calling a subroutine? 
+Why or why not?
+
+
+### A
+
+I can't...
+Because, without calling subroutine, I can't use recursive functions.
+So I must use `for`, `while`, `do while` statement to make iterative process.
+But they are statement: not a expression, so they don't "return" value.
+That's because i can't make macro: macro must "return" correct gcd, that means the macro must be evaluated.
+
+
+---
+
+
+## 3-24
  
 ### Q
 
@@ -989,7 +1063,7 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 ---
 
 
-## 3-
+## 3-25
  
 ### Q
 
@@ -1004,7 +1078,7 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 ---
 
 
-## 3-
+## 3-26
  
 ### Q
 
@@ -1019,7 +1093,7 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 ---
 
 
-## 3-
+## 3-27
  
 ### Q
 
@@ -1034,7 +1108,7 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 ---
 
 
-## 3-
+## 3-28
  
 ### Q
 
@@ -1049,7 +1123,7 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 ---
 
 
-## 3-
+## 3-29
  
 ### Q
 
@@ -1064,7 +1138,7 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 ---
 
 
-## 3-
+## 3-30
  
 ### Q
 
@@ -1079,7 +1153,7 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 ---
 
 
-## 3-
+## 3-31
  
 ### Q
 
@@ -1087,262 +1161,6 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 
 
 ### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
-
-
-
----
-
-
-## 3-
- 
-### Q
-
-
-
-
-### A
-
 
 
 
