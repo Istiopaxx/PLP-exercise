@@ -20,4 +20,6 @@ PLP EXERCISE 모음집
 ### 참고 자료
 - [Companion Site](https://booksite.elsevier.com/9780124104099/)
 
+- [Additional Sections](https://booksite.elsevier.com/9780124104099/content/Sections%20and%20Sub-sections/Scott%204e_Supplementary%20Sections.pdf)
+
 

@@ -108,7 +108,7 @@ Give an example of a program in Scheme or Common Lisp that would not work correc
 ---
 
 
-## 3-3
+## [3-3](#TOC)
  
 ### Q
 
@@ -127,7 +127,7 @@ Give two examples in which it might make sense to delay the binding of an implem
 ---
 
 
-## 3-4
+## [3-4](#TOC)
  
 ### Q
 
@@ -148,7 +148,7 @@ So I think with Javascript.
 
 ---
 
-## 3-5
+## [3-5](#TOC)
  
 ### Q
 
@@ -203,7 +203,7 @@ In Modula-3
 ---
 
 
-## 3-6
+## [3-6](#TOC)
  
 ### Q
 
@@ -285,7 +285,7 @@ Then it finds `g` in `main: stack 0`'s scope, then it finds `g`.
 ---
 
 
-## 3-7
+## [3-7](#TOC)
  
 ### Q
 
@@ -378,7 +378,7 @@ That's because the data is strangely corrupted.
 ---
 
 
-## 3-8
+## [3-8](#TOC)
  
 ### Q
 
@@ -443,7 +443,7 @@ namespace rand_mgr {
 ---
 
 
-## 3-9
+## [3-9](#TOC)
  
 ### Q
 
@@ -542,7 +542,7 @@ while (is_next_token()) {
 ---
 
 
-## 3-10
+## [3-10](#TOC)
  
 ### Q
 
@@ -567,7 +567,7 @@ You may find it helpful to construct a `call graph` data structure in which each
 ---
 
 
-## 3-11
+## [3-11](#TOC)
  
 ### Q
 
@@ -602,7 +602,7 @@ Z : real // in 7th line
 ---
 
 
-## 3-12
+## [3-12](#TOC)
  
 ### Q
 
@@ -639,7 +639,7 @@ Write a simple program in Scheme that displays three different behaviors, depend
 ---
 
 
-## 3-13
+## [3-13](#TOC)
  
 ### Q
 
@@ -677,7 +677,7 @@ Explain your answers.
 ---
 
 
-## 3-14
+## [3-14](#TOC)
  
 ### Q
 
@@ -736,7 +736,7 @@ So 17th line `print_x()` call use most recent used, and alive in current executi
 ---
 
 
-## 3-15
+## [3-15](#TOC)
  
 ### Q
 
@@ -784,7 +784,7 @@ This way is dangerous: programmer may forget to restore the value.
 ---
 
 
-## 3-16
+## [3-16](#TOC)
  
 ### Q
 
@@ -794,22 +794,22 @@ Consider the implications of these features in the following C# program:
 
 
 ```c-sharp
-using System;
-
-public delegate int UnaryOp(int n);
-    // type declaration: UnaryOp is a function from ints to ints
-
-public class Foo {
-    static int a = 2;
-    static UnaryOp b(int c) {
-        int d = a + c;
-        Console.WriteLine(d);
-        return delegate(int n) { return c + n; };
-    }
-    public static void Main(string[] args) {
-        Console.WriteLine(b(3)(4));
-    }
-}
+1.  using System;
+2.  
+3.  public delegate int UnaryOp(int n);
+4.      // type declaration: UnaryOp is a function from ints to ints
+5.  
+6.  public class Foo {
+7.      static int a = 2;
+8.      static UnaryOp b(int c) {
+9.          int d = a + c;
+10.         Console.WriteLine(d);
+11.         return delegate(int n) { return c + n; };
+12.     }
+13.     public static void Main(string[] args) {
+14.         Console.WriteLine(b(3)(4));
+15.     }
+16. }
 ```
 What does this program print? Which of a, b, c, and d, if any, is likely to be statically allocated? 
 Which could be allocated on the stack? 
@@ -819,13 +819,32 @@ Explain.
 
 ### A
 
+```
+5   // 10th line
+7   // 14th line
+```
 
+1. `a`
+    + `a` is statically allocated.
+    + It is declared using `static` keyword.
+2. b 
+    + `b` is statically allocated.
+    + It is just a ordinary function.
+3. c
+    + `c` is heap allocated.
+    + It is argument of function `b`, but it is used in the closure which `b` returns.
+    + And in closure, the `c` is free variable, so `c` is in closure and heap allocated.
+4. d
+    + `d` is stack allocated.
+    + It is just a local variable in function `b` and it is not used after `b` returned.
+
+[Reference](https://stackoverflow.com/questions/271440/captured-variable-in-a-loop-in-c-sharp/271447#271447)
 
 
 ---
 
 
-## 3-17
+## [3-17](#TOC)
  
 ### Q
 
@@ -847,7 +866,7 @@ Explain.
 ---
 
 
-## 3-18
+## [3-18](#TOC)
  
 ### Q
 
@@ -904,7 +923,7 @@ Why?
 ---
 
 
-## 3-19
+## [3-19](#TOC)
  
 ### Q
 
@@ -956,7 +975,7 @@ What does it print if the language uses dynamic scoping with shallow binding?
 ---
 
 
-## 3-20
+## [3-20](#TOC)
  
 ### Q
 
@@ -991,7 +1010,7 @@ If the operation has only no-data-loss type arguments combination, coercion give
 
 ---
 
-## 3-21
+## [3-21](#TOC)
  
 ### Q
 
@@ -1008,7 +1027,7 @@ For extra credit, create a conversion routine that accepts two floating-point pa
 ---
 
 
-## 3-22
+## [3-22](#TOC)
  
 ### Q
 
@@ -1028,7 +1047,7 @@ In an imperative language with lambda expressions (e.g., C#, Ruby, C++, or Java)
 ---
 
 
-## 3-23
+## [3-23](#TOC)
 
 ### Q
 
@@ -1040,7 +1059,7 @@ Why or why not?
 
 I can't...
 Because, without calling subroutine, I can't use recursive functions.
-So I must use `for`, `while`, `do while` statement to make iterative process.
+So I must use `for`, `while`, `do ... while` statement to make iterative process.
 But they are statement: not a expression, so they don't "return" value.
 That's because i can't make macro: macro must "return" correct gcd, that means the macro must be evaluated.
 
@@ -1048,7 +1067,7 @@ That's because i can't make macro: macro must "return" correct gcd, that means t
 ---
 
 
-## 3-24
+## [3-24](#TOC)
  
 ### Q
 
@@ -1063,7 +1082,7 @@ That's because i can't make macro: macro must "return" correct gcd, that means t
 ---
 
 
-## 3-25
+## [3-25](#TOC)
  
 ### Q
 
@@ -1078,7 +1097,7 @@ That's because i can't make macro: macro must "return" correct gcd, that means t
 ---
 
 
-## 3-26
+## [3-26](#TOC)
  
 ### Q
 
@@ -1093,7 +1112,7 @@ That's because i can't make macro: macro must "return" correct gcd, that means t
 ---
 
 
-## 3-27
+## [3-27](#TOC)
  
 ### Q
 
@@ -1108,7 +1127,7 @@ That's because i can't make macro: macro must "return" correct gcd, that means t
 ---
 
 
-## 3-28
+## [3-28](#TOC)
  
 ### Q
 
@@ -1123,7 +1142,7 @@ That's because i can't make macro: macro must "return" correct gcd, that means t
 ---
 
 
-## 3-29
+## [3-29](#TOC)
  
 ### Q
 
@@ -1138,7 +1157,7 @@ That's because i can't make macro: macro must "return" correct gcd, that means t
 ---
 
 
-## 3-30
+## [3-30](#TOC)
  
 ### Q
 
@@ -1153,7 +1172,7 @@ That's because i can't make macro: macro must "return" correct gcd, that means t
 ---
 
 
-## 3-31
+## [3-31](#TOC)
  
 ### Q
 
